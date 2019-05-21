@@ -1,5 +1,5 @@
 import { DocumentReference, FieldValue } from "@google-cloud/firestore";
-import { store } from "./common";
+import { store } from "../common";
 import { DateTime } from "luxon";
 
 export interface UserModel {
