@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 
 export interface UserModel {
     nickname: string;
+    guildId?: string;
 
     friends: string[];
     friendRequested: string[];
@@ -14,7 +15,7 @@ export interface UserModel {
 export class User {
     public data?: UserModel;
 
-    private static get users() { return store.collection('user'); }
+    public static get users() { return store.collection('user'); }
     public get uid() { return this.ref.id; }
     private get friendRequestedRef() { return this.ref.collection('friendRequested') }
 
@@ -67,10 +68,19 @@ export class User {
         })
     }
 
-    async setNickname(nickname: string) {
-        await this.ref.update({
-            nickname
+    async joinGuild(guildId: string) {
+        await this.update({
+            guild: guildId
         });
+    }
+    async leaveGuild() {
+        await this.update({
+            guild: null
+        });
+    }
+
+    async update(property : any) {
+        await this.ref.update(property);
     }
     async updatePresence() {
         await this.ref.update({
@@ -83,7 +93,8 @@ export class User {
         this.data = (await this.ref.get()).data() as any;
     }
 
-    toExportable() {
+    async toExportable() {
+        await this.ensureDataExistInLocal();
         let data = this.data!;
         
         return {
