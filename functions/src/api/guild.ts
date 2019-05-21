@@ -3,10 +3,10 @@ import { onHttpsCall } from '../common';
 import { User } from '../user';
 import { Guild } from '../guild';
 
-export const getGuild = onHttpsCall(async (data, ctx) => {
+export const guild_getGuild = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guild = Guild.get(ctx.auth.uid);
+    let guild = Guild.get(data.gid);
     await guild.ensureDataExistInLocal();
 
     return {
@@ -16,7 +16,7 @@ export const getGuild = onHttpsCall(async (data, ctx) => {
 export const guild_transferOwnership = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guild = Guild.get(ctx.auth.uid);
+    let guild = Guild.get(data.gid);
     await guild.ensureDataExistInLocal();
 
     if (guild.data!.owner != ctx.auth.uid)
@@ -33,7 +33,7 @@ export const guild_transferOwnership = onHttpsCall(async (data, ctx) => {
 export const guild_grantSubownership = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guild = Guild.get(ctx.auth.uid);
+    let guild = Guild.get(data.id);
     await guild.ensureDataExistInLocal();
 
     if (guild.data!.owner != ctx.auth.uid)

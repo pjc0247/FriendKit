@@ -31,18 +31,31 @@ namespace FriendKit
                 {
                 });
 
-            return Reinterpret<GetUserResponse>(resp.Data).user;
-        }
-        private static T Reinterpret<T>(object input)
-        {
-            var json = JsonConvert.SerializeObject(input);
-            return JsonConvert.DeserializeObject<T>(json);
+            return resp.Data.Reinterpret<GetUserResponse>().user;
         }
 
         public async Task RequestFriend(User user)
         {
             var func = FB.Functions;
             var resp = await func.GetHttpsCallable("user_requestFriend")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["uid"] = user.id
+                });
+        }
+        public async Task AcceptFriendRequest(User user)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("user_acceptFriendRequest")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["uid"] = user.id
+                });
+        }
+        public async Task RejectFriendRequest(User user)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("user_rejectFriendRequest")
                 .CallAsync(new Dictionary<string, object>()
                 {
                     ["uid"] = user.id
@@ -57,7 +70,7 @@ namespace FriendKit
                 {
                 });
 
-            return Reinterpret<GetFriendsResponse>(resp.Data).friends;
+            return resp.Data.Reinterpret<GetFriendsResponse>().friends;
         }
         public async Task<User[]> GetFriendRequestsFromMe()
         {
@@ -67,7 +80,7 @@ namespace FriendKit
                 {
                 });
 
-            return Reinterpret<GetFriendsResponse>(resp.Data).friends;
+            return resp.Data.Reinterpret<GetFriendsResponse>().friends;
         }
         public async Task<User[]> GetFriends()
         {
@@ -77,7 +90,7 @@ namespace FriendKit
                 {
                 });
 
-            return Reinterpret<GetFriendsResponse>(resp.Data).friends;
+            return resp.Data.Reinterpret<GetFriendsResponse>().friends;
         }
     }
 
