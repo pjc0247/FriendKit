@@ -4,7 +4,6 @@ using UnityEngine;
 
 using Firebase;
 using Firebase.Auth;
-using Firebase.Storage;
 using Firebase.Functions;
 
 namespace FriendKit

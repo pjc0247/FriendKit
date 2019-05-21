@@ -92,6 +92,15 @@ namespace FriendKit
 
             return resp.Data.Reinterpret<GetFriendsResponse>().friends;
         }
+
+        public async Task UpdatePresence()
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("user_updatePresence")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                });
+        }
     }
 
     class GetUserResponse
