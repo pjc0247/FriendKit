@@ -58,6 +58,7 @@ export class Guild {
         let data = this.data!;
 
         return {
+            id: this.ref.id,
             name: data.name,
             owner: User.get(data.owner)
         }

@@ -2,7 +2,7 @@ import { NotAuthorizedError } from '../error';
 import { onHttpsCall } from '../common';
 import { User } from '../user';
 
-export const getMe = onHttpsCall(async (data, ctx) => {
+export const user_getMe = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
@@ -13,7 +13,7 @@ export const getMe = onHttpsCall(async (data, ctx) => {
     };
 });
 
-export const requestFriend = onHttpsCall(async (data, ctx) => {
+export const user_requestFriend = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
@@ -22,7 +22,7 @@ export const requestFriend = onHttpsCall(async (data, ctx) => {
     return {
     };
 });
-export const acceptFriendRequest = onHttpsCall(async (data, ctx) => {
+export const user_acceptFriendRequest = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
@@ -31,7 +31,7 @@ export const acceptFriendRequest = onHttpsCall(async (data, ctx) => {
     return {
     };
 });
-export const rejectFriendRequest = onHttpsCall(async (data, ctx) => {
+export const user_rejectFriendRequest = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
@@ -41,7 +41,7 @@ export const rejectFriendRequest = onHttpsCall(async (data, ctx) => {
     };
 });
 
-export const getFriends = onHttpsCall(async (data, ctx) => {
+export const user_getFriends = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
@@ -51,7 +51,7 @@ export const getFriends = onHttpsCall(async (data, ctx) => {
         friends
     };
 });
-export const getFriendRequestsFromMe = onHttpsCall(async (data, ctx) => {
+export const user_getFriendRequestsFromMe = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
@@ -61,7 +61,7 @@ export const getFriendRequestsFromMe = onHttpsCall(async (data, ctx) => {
         friends
     };
 });
-export const getFriendRequestsToMe = onHttpsCall(async (data, ctx) => {
+export const user_getFriendRequestsToMe = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);

@@ -98,6 +98,7 @@ export class User {
         let data = this.data!;
         
         return {
+            id: this.ref.id,
             nickname: data.nickname,
             presence: 
                 DateTime.fromJSDate(data.presence).diffNow().minutes <= 10 ?
