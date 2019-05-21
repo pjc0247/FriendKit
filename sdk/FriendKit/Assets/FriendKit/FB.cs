@@ -39,17 +39,6 @@ namespace FriendKit
             }
         }
 
-        private static FirebaseStorage _Storage;
-        public static FirebaseStorage Storage
-        {
-            get
-            {
-                if (_Storage == null)
-                    _Storage = FirebaseStorage.GetInstance(App, "gs://modplayer-kr.appspot.com/");
-                return _Storage;
-            }
-        }
-
         private static FirebaseFunctions _Functions;
         public static FirebaseFunctions Functions
         {
