@@ -34,7 +34,7 @@ export class Guild {
         return guild;
     }
     static async query(name: string): Promise<Guild[]> {
-        let results = await Alagolia.getIndex('guild')
+        let results = await Alagolia.getIndex('guild_name')
             .search(name);
         let guilds = [];
         for (const hit of results.hits) {
@@ -80,7 +80,7 @@ export class Guild {
 }
 
 exports.onGuildUpdated = functions.firestore.document('guid/{guid_id}/name').onWrite(async (snap, context) => {
-    await Alagolia.getIndex('guild')
+    await Alagolia.getIndex('guild_name')
         .saveObject({
             objectID: context.params.guild_id,
             name: snap.after.data()

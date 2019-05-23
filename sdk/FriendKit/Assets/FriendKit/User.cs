@@ -16,13 +16,15 @@ namespace FriendKit
         Offline
     }
 
-    public class User
+    public class UserModel
     {
         public string id;
-        public string nickname;
+        public string name;
         public string guildId;
         public Presence presence;
-
+    }
+    public class User : UserModel
+    {
         public async static Task<User> GetMe()
         {
             var func = FB.Functions;
@@ -45,6 +47,15 @@ namespace FriendKit
             return resp.Data.Reinterpret<GetUserResponse>().user;
         }
 
+        public async Task Update(UserModel user)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("user_updateProperty")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["name"] = user.name
+                });
+        }
         public async Task RequestFriend(User user)
         {
             var func = FB.Functions;
