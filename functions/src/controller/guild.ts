@@ -58,6 +58,7 @@ export class Guild {
     }
 
     async update(property : any) {
+        property = _.pick(property, ['name']);
         await this.ref.update(property);
     }
 

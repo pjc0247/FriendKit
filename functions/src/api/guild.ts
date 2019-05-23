@@ -6,7 +6,7 @@ import { Guild } from '../controller/guild';
 export const guild_getGuild = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guild = Guild.get(data.gid);
+    const guild = Guild.get(data.gid);
     await guild.ensureDataExistInLocal();
 
     return {
@@ -16,18 +16,34 @@ export const guild_getGuild = onHttpsCall(async (data, ctx) => {
 export const guild_queryGuild = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guilds = await Guild.query(data.name);
-    for (const guild of guilds)
-        await guild.ensureDataExistInLocal();
+    const guilds = await Guild.query(data.name);
+    await Promise.all(
+        guilds.map(x => x.ensureDataExistInLocal())
+    );
 
     return {
         guilds
     };
 });
+export const guild_updateProperty = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    const guild = Guild.get(data.gid);
+    await guild.ensureDataExistInLocal();
+
+    if (guild.data!.owner != ctx.auth.uid)
+        throw new PermissionDeniedError();
+
+    await guild.update(data);
+
+    return {
+        guild
+    };
+});
 export const guild_transferOwnership = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guild = Guild.get(data.gid);
+    const guild = Guild.get(data.gid);
     await guild.ensureDataExistInLocal();
 
     if (guild.data!.owner != ctx.auth.uid)
@@ -44,7 +60,7 @@ export const guild_transferOwnership = onHttpsCall(async (data, ctx) => {
 export const guild_grantSubownership = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
-    let guild = Guild.get(data.id);
+    const guild = Guild.get(data.id);
     await guild.ensureDataExistInLocal();
 
     if (guild.data!.owner != ctx.auth.uid)
