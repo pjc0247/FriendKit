@@ -33,6 +33,17 @@ namespace FriendKit
 
             return resp.Data.Reinterpret<GetUserResponse>().user;
         }
+        public async static Task<User> GetByEmail(string email)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("user_getUserByEmail")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["email"] = email
+                });
+
+            return resp.Data.Reinterpret<GetUserResponse>().user;
+        }
 
         public async Task RequestFriend(User user)
         {

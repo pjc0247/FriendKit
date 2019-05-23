@@ -1,11 +1,23 @@
 import { NotAuthorizedError } from '../error';
 import { onHttpsCall } from '../common';
-import { User } from '../user';
+import { User } from '../controller/user';
+import * as admin from 'firebase-admin';
 
 export const user_getMe = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 
     let user = User.get(ctx.auth.uid);
+    await user.ensureDataExistInLocal();
+
+    return {
+        user
+    };
+});
+export const user_getUserByEmail = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    let fbUser = await admin.auth().getUserByEmail(data.email);
+    let user = User.get(fbUser.uid);
     await user.ensureDataExistInLocal();
 
     return {
