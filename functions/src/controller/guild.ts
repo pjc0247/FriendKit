@@ -33,13 +33,16 @@ export class Guild {
         );
         return guild;
     }
-    static async query(name: string) {
-        let result = await Alagolia.getIndex('guild')
-                .query(name);
-        let guild = new Guild(
-            Guild.guilds.doc(uid)
-        );
-        return guild;
+    static async query(name: string): Promise<Guild[]> {
+        let results = await Alagolia.getIndex('guild')
+            .search(name);
+        let guilds = [];
+        for (const hit of results.hits) {
+            guilds.push(new Guild(
+                Guild.guilds.doc(hit.objectID)
+            ));
+        }
+        return guilds;
     }
 
     constructor(private ref: DocumentReference, 
@@ -76,11 +79,9 @@ export class Guild {
 }
 
 exports.onGuildUpdated = functions.firestore.document('guid/{guid_id}/name').onWrite(async (snap, context) => {
-    const guildRef = await snap.after.ref.parent.get();
-    const guild = guildRef.docs[0].data();  
-
-    guild.objectID = context.params.noteId; 
-
     await Alagolia.getIndex('guild')
-            .saveObject(guild);
+        .saveObject({
+            objectID: context.params.guild_id,
+            name: snap.after.data()
+        });
 });

@@ -1,7 +1,7 @@
 import { NotAuthorizedError, PermissionDeniedError, InvalidOperationError } from '../error';
 import { onHttpsCall } from '../common';
-import { User } from '../user';
-import { Guild } from '../guild';
+import { User } from '../controller/user';
+import { Guild } from '../controller/guild';
 
 export const guild_getGuild = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
@@ -11,6 +11,17 @@ export const guild_getGuild = onHttpsCall(async (data, ctx) => {
 
     return {
         guild
+    };
+});
+export const guild_queryGuild = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    let guilds = await Guild.query(data.name);
+    for (const guild of guilds)
+        await guild.ensureDataExistInLocal();
+
+    return {
+        guilds
     };
 });
 export const guild_transferOwnership = onHttpsCall(async (data, ctx) => {
