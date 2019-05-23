@@ -7,7 +7,7 @@ const algolia = algoliasearch(
   process.env.ALGOLIA_APP_ID!,
   process.env.ALGOLIA_API_KEY!
 );
-const indexes = {};
+const indexes: {[key:string]: algoliasearch.Index} = {};
 
 export class Alagolia {
     public static getIndex(key: string): algoliasearch.Index {
