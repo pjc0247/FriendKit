@@ -25,6 +25,17 @@ export const user_getUserByEmail = onHttpsCall(async (data, ctx) => {
     };
 });
 
+export const user_updateProperty = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    const user = User.get(ctx.auth.uid);
+    await user.update(data);
+
+    return {
+        user
+    };
+});
+
 export const user_requestFriend = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 

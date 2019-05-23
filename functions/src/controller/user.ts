@@ -3,7 +3,7 @@ import { store } from "../common";
 import { DateTime } from "luxon";
 
 export interface UserModel {
-    nickname: string;
+    name: string;
     guildId?: string;
 
     friends: string[];
@@ -80,6 +80,7 @@ export class User {
     }
 
     async update(property : any) {
+        property = _.pick(property, ['name']);
         await this.ref.update(property);
     }
     async updatePresence() {
@@ -99,7 +100,7 @@ export class User {
         
         return {
             id: this.ref.id,
-            nickname: data.nickname,
+            nickname: data.name,
             presence: 
                 DateTime.fromJSDate(data.presence).diffNow().minutes <= 10 ?
                 'online' : 'offline'
