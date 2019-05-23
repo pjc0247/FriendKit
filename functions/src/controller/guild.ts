@@ -1,7 +1,9 @@
+import * as functions from 'firebase-functions';
 import { DocumentReference, FieldValue } from "@google-cloud/firestore";
-import { store } from "./common";
+import { store } from "../common";
 import { DateTime } from "luxon";
 import { User } from "./user";
+import { Alagolia } from '../thirdparty/algolia';
 
 export interface GuildModel {
     name: string;
@@ -26,6 +28,14 @@ export class Guild {
         return guild;
     }
     static get(uid: string) {
+        let guild = new Guild(
+            Guild.guilds.doc(uid)
+        );
+        return guild;
+    }
+    static async query(name: string) {
+        let result = await Alagolia.getIndex('guild')
+                .query(name);
         let guild = new Guild(
             Guild.guilds.doc(uid)
         );
@@ -64,3 +74,13 @@ export class Guild {
         }
     }
 }
+
+exports.onGuildUpdated = functions.firestore.document('guid/{guid_id}/name').onWrite(async (snap, context) => {
+    const guildRef = await snap.after.ref.parent.get();
+    const guild = guildRef.docs[0].data();  
+
+    guild.objectID = context.params.noteId; 
+
+    await Alagolia.getIndex('guild')
+            .saveObject(guild);
+});
