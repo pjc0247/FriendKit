@@ -12,6 +12,8 @@ namespace FriendKit
     {
         public string id;
         public string name;
+
+        public UserModel[] users;
     }
     public class Guild : GuildModel
     {
