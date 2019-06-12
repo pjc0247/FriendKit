@@ -70,6 +70,15 @@ namespace FriendKit
                 });
         }
 
+        public async Task RequestJoin(User user)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("guild_requestJoin")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["gid"] = id
+                });
+        }
         public async Task AcceptRequest(User user)
         {
             var func = FB.Functions;
