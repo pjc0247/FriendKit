@@ -69,6 +69,27 @@ namespace FriendKit
                     ["uid"] = user.id
                 });
         }
+
+        public async Task AcceptRequest(User user)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("guild_acceptRequest")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["gid"] = id,
+                    ["uid"] = user.id
+                });
+        }
+        public async Task RejectRequest(User user)
+        {
+            var func = FB.Functions;
+            var resp = await func.GetHttpsCallable("guild_rejectRequest")
+                .CallAsync(new Dictionary<string, object>()
+                {
+                    ["gid"] = id,
+                    ["uid"] = user.id
+                });
+        }
     }
 
     class GetGuildResponse
