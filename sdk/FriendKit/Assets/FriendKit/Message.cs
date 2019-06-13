@@ -12,6 +12,9 @@ namespace FriendKit
     {
         public string id;
 
+        public User sender;
+        public User receiver;
+
         public string title;
         public string body;
     }
