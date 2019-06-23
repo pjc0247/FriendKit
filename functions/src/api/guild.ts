@@ -9,8 +9,10 @@ export const guild_getGuild = onHttpsCall(async (data, ctx) => {
     const guild = Guild.get(data.gid);
     await guild.ensureDataExistInLocal();
 
+    const users = await guild.getUsers();
     return {
-        guild
+        ...guild,
+        users
     };
 });
 export const guild_queryGuild = onHttpsCall(async (data, ctx) => {
@@ -25,6 +27,45 @@ export const guild_queryGuild = onHttpsCall(async (data, ctx) => {
         guilds
     };
 });
+
+export const guild_requestJoin = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    const guild = Guild.get(data.gid);
+    const user = User.get(ctx.auth.uid);
+
+    await guild.requestJoin(user);
+
+    return {
+    };
+});
+export const guild_acceptRequest = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    const guild = Guild.get(data.gid);
+    if (guild.data!.owner != ctx.auth.uid)
+        throw new PermissionDeniedError();
+
+    const user = User.get(data.uid);
+    await guild.acceptRequest(user);
+    
+    return {
+    };
+});
+export const guild_rejectRequest = onHttpsCall(async (data, ctx) => {
+    if (!ctx.auth) throw new NotAuthorizedError();
+
+    const guild = Guild.get(data.gid);
+    if (guild.data!.owner != ctx.auth.uid)
+        throw new PermissionDeniedError();
+
+    const user = User.get(data.uid);
+    await guild.rejectRequest(user);
+    
+    return {
+    };
+});
+
 export const guild_updateProperty = onHttpsCall(async (data, ctx) => {
     if (!ctx.auth) throw new NotAuthorizedError();
 

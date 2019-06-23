@@ -4,6 +4,11 @@ import { store } from "../common";
 import { DateTime } from "luxon";
 import { User } from "./user";
 import { Alagolia } from '../thirdparty/algolia';
+import { BaseController } from './base_controller';
+
+export enum GuildGrade {
+    Bronze, Silver, Gold, Platinum, Diamond
+};
 
 export interface GuildModel {
     name: string;
@@ -11,11 +16,11 @@ export interface GuildModel {
     owner: string;
     subOwner1: string;
     subOwner2: string;
+
+    memberCount: number;
 }
 
-export class Guild {
-    public data?: GuildModel;
-
+export class Guild extends BaseController<GuildModel> {
     public static get guilds() { return store.collection('guild'); }
 
     static async create(owner: User, name: string) {
@@ -44,12 +49,7 @@ export class Guild {
         }
         return guilds;
     }
-
-    constructor(private ref: DocumentReference, 
-                data?: any) {
-        this.data = data;
-    }
-
+    
     async getUsers() {
         let users = await User.users
              .where('guildId', '==', this.ref.id)
@@ -57,14 +57,26 @@ export class Guild {
         return users.docs.map(x => new User(x.ref, x.data()));
     }
 
+    async requestJoin(user: User) {
+        await user.update({
+            requestingGuildId: this.id
+        });
+    }
+    async acceptRequest(user: User) {
+        await user.update({
+            guildId: this.id,
+            requestingGuildId: null
+        });
+    }
+    async rejectRequest(user: User) {
+        await user.update({
+            requestingGuildId: null
+        });
+    }
+
     async update(property : any) {
         property = _.pick(property, ['name']);
         await this.ref.update(property);
-    }
-
-    async ensureDataExistInLocal() {
-        if (this.data) return;
-        this.data = (await this.ref.get()).data() as any;
     }
 
     async toExportable() {
@@ -79,7 +91,7 @@ export class Guild {
     }
 }
 
-exports.onGuildUpdated = functions.firestore.document('guid/{guid_id}/name').onWrite(async (snap, context) => {
+exports.onGuildUpdated = functions.firestore.document('guild/{guild_id}/name').onWrite(async (snap, context) => {
     await Alagolia.getIndex('guild_name')
         .saveObject({
             objectID: context.params.guild_id,

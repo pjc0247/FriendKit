@@ -1,20 +1,32 @@
-import { DocumentReference, FieldValue } from "@google-cloud/firestore";
+import * as functions from 'firebase-functions';
+import { DocumentReference, FieldValue, Firestore } from "@google-cloud/firestore";
 import { store } from "../common";
 import { DateTime } from "luxon";
+import { InvalidOperationError } from "../error";
+import { BaseController } from "./base_controller";
+import { InventoryItem, ItemType } from "../model/item";
+import { Equipments } from "../model/equipments";
+import { firestore } from 'firebase-admin';
 
 export interface UserModel {
     name: string;
+    character: string;  // 외형
+
     guildId?: string;
+    requestingGuildId?: string;
 
     friends: string[];
     friendRequested: string[];
 
+    balances: {[key: string]: number};
+
+    inventory: InventoryItem[];
+    equipments: Equipments;
+
     presence: Date;
 }
 
-export class User {
-    public data?: UserModel;
-
+export class User extends BaseController<UserModel> {
     public static get users() { return store.collection('user'); }
     public get uid() { return this.ref.id; }
     private get friendRequestedRef() { return this.ref.collection('friendRequested') }
@@ -24,11 +36,6 @@ export class User {
             store.collection('user').doc(uid)
         );
         return user;
-    }
-
-    constructor(private ref: DocumentReference, 
-                data?: any) {
-        this.data = data;
     }
 
     async getFriends() {
@@ -79,8 +86,37 @@ export class User {
         });
     }
 
+    async credit(key: string, value: number) {
+        if (value <= 0)
+            throw new InvalidOperationError('Credit value must be greater than zero');
+
+        await this.ref.update({
+            balances: {
+                key: FieldValue.increment(value)
+            }
+        })
+    }
+    async withdraw(key: string, value: number) {
+        if (value <= 0)
+            throw new InvalidOperationError('Withdraw value must be greater than zero');
+
+        await store.runTransaction(async (tx) => {
+            let user = (await tx.get(this.ref)).data() as UserModel;
+            if (!user.balances[key] &&
+                user.balances[key] <= 0) {
+                throw new InvalidOperationError('Insufficient value');
+            }
+
+            tx.update(this.ref, {
+                balances: {
+                    key: FieldValue.increment(-value)
+                }
+            });
+        });
+    }
+
     async update(property : any) {
-        property = _.pick(property, ['name']);
+        property = _.pick(property, ['name', 'character']);
         await this.ref.update(property);
     }
     async updatePresence() {
@@ -89,9 +125,54 @@ export class User {
         })
     }
 
-    async ensureDataExistInLocal() {
-        if (this.data) return;
-        this.data = (await this.ref.get()).data() as any;
+    async addItem(name: string, quantity: number) {
+        let inventory = this.data!.inventory;
+        const idx = inventory.findIndex(x => x.id == name);
+        
+        if (idx == -1) {
+            inventory.push({
+                id: name,
+                quantity   
+            });
+        }
+        else 
+            inventory[idx].quantity += quantity;
+
+        await this.update({
+            inventory
+        });
+    }
+    async consumeItem(name: string, quantity: number) {
+
+    }
+    async stashItem(name: string) {
+        await this.update({
+            inventory: this.data!.inventory
+                .filter(x => x.id !== name)
+        });
+    }
+    async equip(item: InventoryItem) {
+        if (item.type == ItemType.None)
+            return false;
+
+        let equipments: {[key: string]: InventoryItem} = {};
+        switch (item.type) {
+            case ItemType.Head: 
+                equipments.head = item;
+                break;
+            case ItemType.Weapon:
+                equipments.weapon = item;
+                break;
+            case ItemType.Shield:
+                equipments.shield = item;
+                break;
+        }
+
+        await this.update({
+            equipments
+        });
+
+        return true;
     }
 
     async toExportable() {
@@ -107,3 +188,12 @@ export class User {
         };
     }
 }
+
+exports.onUserCreated = functions.firestore.document('user').onCreate(async (snap, context) => {
+    // Present default equipments
+    await snap.ref.update({
+        equipments: {
+
+        }
+    });
+});
