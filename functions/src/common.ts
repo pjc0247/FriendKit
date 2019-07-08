@@ -6,7 +6,7 @@ admin.initializeApp();
 export const store = admin.firestore();
 
 // Creates a wrapped https trigger 
-export async function onHttpsCall(func: (data: any, ctx: CallableContext) => any) {
+export function onHttpsCall(func: (data: any, ctx: CallableContext) => any) {
     return functions.https.onCall(async (data, ctx) => {
         try {
             let result = await func(data, ctx);
