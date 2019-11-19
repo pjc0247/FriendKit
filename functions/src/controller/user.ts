@@ -159,13 +159,22 @@ export class User extends BaseController<UserModel> {
             inventory
         });
     }
+    hasItem(name: string, quantity = 1) {
+        let inventory = this.data!.inventory;
+        const idx = inventory.findIndex(x => x.id == name);
+
+        if (idx == -1) return false;
+        if (inventory[idx].quantity >= quantity)
+            return true;
+        return false;
+    }
     async stashItem(name: string) {
         await this.update({
             inventory: this.data!.inventory
                 .filter(x => x.id !== name)
         });
     }
-    
+
     async equip(item: InventoryItem) {
         if (item.type == ItemType.None)
             return false;
