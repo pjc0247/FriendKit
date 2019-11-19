@@ -47,4 +47,4 @@ user.consumeItem('sword', 1);
 __Stash Item__
 ```ts
 user.stashItem('sword');
-```
+``` 
