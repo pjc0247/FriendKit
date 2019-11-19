@@ -143,7 +143,21 @@ export class User extends BaseController<UserModel> {
         });
     }
     async consumeItem(name: string, quantity: number) {
+        let inventory = this.data!.inventory;
+        const idx = inventory.findIndex(x => x.id == name);
+        
+        if (idx == -1)
+            throw new InvalidOperationError('item does not exist');
+        if (inventory[idx].quantity < quantity)
+            throw new InvalidOperationError('insufficient item quantity');
 
+        inventory[idx].quantity -= quantity;
+        if (inventory[idx].quantity == 0)
+            delete inventory[idx];
+
+        await this.update({
+            inventory
+        });
     }
     async stashItem(name: string) {
         await this.update({
@@ -151,6 +165,7 @@ export class User extends BaseController<UserModel> {
                 .filter(x => x.id !== name)
         });
     }
+    
     async equip(item: InventoryItem) {
         if (item.type == ItemType.None)
             return false;
