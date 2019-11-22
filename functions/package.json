@@ -13,11 +13,13 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@types/in-app-purchase": "^1.10.1",
     "@types/lodash": "^4.14.130",
     "algoliasearch": "^3.33.0",
     "dotenv": "^8.0.0",
     "firebase-admin": "~7.0.0",
     "firebase-functions": "^2.3.0",
+    "in-app-purchase": "^1.11.4",
     "luxon": "^1.15.0",
     "moment": "^2.24.0"
   },
