@@ -10,6 +10,10 @@ export class BaseController<T> {
         this.data = data;
     }
 
+    async delete() {
+        await this.ref.delete();
+    }
+
     async ensureDataExistInLocal() {
         if (this.data) return;
         this.data = (await this.ref.get()).data() as any;

@@ -12,7 +12,7 @@ async function waitForIapSetup(){
 }
 async function validateReceipt(receipt: string) {
     await waitForIapSetup();
-    await iap.validate({});
+    const data = await iap.validate({});
 }
 
 export const iap_claim = onHttpsCall(async (data, ctx) => {
