@@ -21,7 +21,7 @@
     "firebase-functions": "^2.3.0",
     "in-app-purchase": "^1.11.4",
     "luxon": "^1.15.0",
-    "moment": "^2.24.0"
+    "moment": "^2.29.4"
   },
   "devDependencies": {
     "@types/algoliasearch": "^3.30.12",
